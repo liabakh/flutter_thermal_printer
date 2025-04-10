@@ -13,7 +13,8 @@ import 'package:screenshot/screenshot.dart';
 import 'Others/other_printers_manager.dart';
 
 export 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
-export 'package:flutter_blue_plus/flutter_blue_plus.dart' show BluetoothDevice, BluetoothConnectionState;
+export 'package:flutter_blue_plus/flutter_blue_plus.dart'
+    show BluetoothDevice, BluetoothConnectionState;
 export 'package:flutter_thermal_printer/network/network_printer.dart';
 
 class FlutterThermalPrinter {
@@ -22,7 +23,7 @@ class FlutterThermalPrinter {
   static FlutterThermalPrinter? _instance;
 
   static FlutterThermalPrinter get instance {
-    FlutterBluePlus.setLogLevel(LogLevel.debug);
+    if (!Platform.isWindows) FlutterBluePlus.setLogLevel(LogLevel.debug);
     _instance ??= FlutterThermalPrinter._();
     return _instance!;
   }
@@ -73,7 +74,10 @@ class FlutterThermalPrinter {
 
   Future<void> getPrinters({
     Duration refreshDuration = const Duration(seconds: 2),
-    List<ConnectionType> connectionTypes = const [ConnectionType.USB, ConnectionType.BLE],
+    List<ConnectionType> connectionTypes = const [
+      ConnectionType.USB,
+      ConnectionType.BLE
+    ],
     bool androidUsesFineLocation = false,
   }) async {
     if (Platform.isWindows) {
@@ -132,7 +136,8 @@ class FlutterThermalPrinter {
     Generator? generator,
   }) async {
     final controller = ScreenshotController();
-    final image = await controller.captureFromLongWidget(widget, pixelRatio: View.of(context).devicePixelRatio, delay: delay);
+    final image = await controller.captureFromLongWidget(widget,
+        pixelRatio: View.of(context).devicePixelRatio, delay: delay);
     Generator? generator0;
     if (generator == null) {
       final profile = await CapabilityProfile.load();

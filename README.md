@@ -1,7 +1,7 @@
 # flutter_thermal_printer
 <img src="https://res.cloudinary.com/daagzbhsu/image/upload/v1735536729/vxobf0gilq0pixfsnjw1.png" />
 
-![Visits Badge](https://badges.pufler.dev/visits/Sunil9162/flutter_thermal_printer)
+![Visits Badge](https://badges.pufler.dev/visits/SunilDevX/flutter_thermal_printer)
 
 Package for all services for thermal printer in Android, iOS, macOS, Windows.
 
@@ -127,6 +127,9 @@ For bug reports or feature requests, feel free to open an issue.
 
 ## Contributors
 
-![Contributors Display](https://badges.pufler.dev/contributors/Sunil9162/flutter_thermal_printer?size=50&padding=5&perRow=10&bots=true)
+![Contributors Display](https://badges.pufler.dev/contributors/SunilDevX/flutter_thermal_printer?size=50&padding=5&perRow=10&bots=true)
+
+
+Feel free to contribute to this project and help make it better for everyone!
 
 ---

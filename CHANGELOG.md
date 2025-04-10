@@ -1,3 +1,7 @@
+## 1.2.1
+* Fixed the issue of Flutter Blue plus for windows as it not supported for windows
+* Github repo for issues is now changed
+
 ## 1.2.0
 * Fixed BLE turn on exception for ios and macos by `@eduardohr-muniz`
 * Reduced time to print image on ble devices by `@eduardohr-muniz`
