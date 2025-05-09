@@ -1,3 +1,6 @@
+## 1.2.1+1
+* Updated the read me file
+
 ## 1.2.1
 * Fixed the issue of Flutter Blue plus for windows as it not supported for windows
 * Github repo for issues is now changed
