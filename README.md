@@ -5,6 +5,11 @@
 
 Package for all services for thermal printer in Android, iOS, macOS, Windows.
 
+## Buy Me A Coffee
+If you find this project helpful and want to support its development, you can buy me a coffee:
+
+<a href="https://www.buymeacoffee.com/SunilDevX" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 ## Getting Started
 
 This plugin is used to print data on thermal printers with ease across multiple platforms.
@@ -122,6 +127,7 @@ Provides real-time monitoring for Bluetooth states, ensuring proactive error han
 We welcome contributions to enhance the plugin's functionality!  
 To contribute, please fork the repository, make changes, and submit a pull request.  
 For bug reports or feature requests, feel free to open an issue.
+ 
 
 ---
 
