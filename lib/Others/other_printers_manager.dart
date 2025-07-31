@@ -18,7 +18,8 @@ class OtherPrinterManager {
     return _instance!;
   }
 
-  final StreamController<List<Printer>> _devicesstream = StreamController<List<Printer>>.broadcast();
+  final StreamController<List<Printer>> _devicesstream =
+      StreamController<List<Printer>>.broadcast();
 
   Stream<List<Printer>> get devicesStream => _devicesstream.stream;
   StreamSubscription? subscription;
@@ -28,10 +29,7 @@ class OtherPrinterManager {
   bool get isIos => !kIsWeb && (Platform.isIOS || Platform.isMacOS);
 
   // Stop scanning for BLE devices
-  Future<void> stopScan({
-    bool stopBle = true,
-    bool stopUsb = true,
-  }) async {
+  Future<void> stopScan({bool stopBle = true, bool stopUsb = true}) async {
     try {
       if (stopBle) {
         await subscription?.cancel();
@@ -115,36 +113,75 @@ class OtherPrinterManager {
           return;
         }
 
-        final services =
-            (await device.discoverServices()).skipWhile((value) => value.characteristics.where((element) => element.properties.write).isEmpty);
+        final services = (await device.discoverServices()).skipWhile(
+          (value) => value.characteristics
+              .where((element) => element.properties.write)
+              .isEmpty,
+        );
 
-        BluetoothCharacteristic? writeCharacteristic;
-        for (var service in services) {
-          for (var characteristic in service.characteristics) {
-            if (characteristic.properties.write) {
-              writeCharacteristic = characteristic;
-              break;
-            }
+        const maxChunkSize = 128;
+
+        try {
+          var service = services
+              .where(
+                (element) =>
+                    element.uuid.toString() ==
+                    '49535343-FE7D-4AE5-8FA9-9FAFD205E455',
+              )
+              .first;
+          log('Service found: ${service.uuid}');
+
+          var characteristic = service.characteristics
+              .where(
+                (element) =>
+                    element.uuid.toString() ==
+                    '49535343-8841-43F4-A8D4-ECBE34729BB3',
+              )
+              .first;
+          log('Characteristic found: ${characteristic.uuid}');
+
+          for (var i = 0; i < bytes.length; i += maxChunkSize) {
+            final chunk = bytes.sublist(
+              i,
+              i + maxChunkSize > bytes.length ? bytes.length : i + maxChunkSize,
+            );
+
+            await characteristic.write(
+              Uint8List.fromList(chunk),
+              withoutResponse: true,
+            );
           }
+        } catch (e) {
+          log('Failed to  device $e');
         }
 
-        if (writeCharacteristic == null) {
-          log('No write characteristic found');
-          return;
-        }
+        // BluetoothCharacteristic? writeCharacteristic;
+        // for (var service in services) {
+        //   for (var characteristic in service.characteristics) {
+        //     if (characteristic.properties.write) {
+        //       writeCharacteristic = characteristic;
+        //       break;
+        //     }
+        //   }
+        // }
 
-        const maxChunkSize = 512;
-        for (var i = 0; i < bytes.length; i += maxChunkSize) {
-          final chunk = bytes.sublist(
-            i,
-            i + maxChunkSize > bytes.length ? bytes.length : i + maxChunkSize,
-          );
+        // if (writeCharacteristic == null) {
+        //   log('No write characteristic found');
+        //   return;
+        // }
 
-          await writeCharacteristic.write(
-            Uint8List.fromList(chunk),
-            withoutResponse: true,
-          );
-        }
+        // const maxChunkSize = 512;
+        // for (var i = 0; i < bytes.length; i += maxChunkSize) {
+        //   final chunk = bytes.sublist(
+        //     i,
+        //     i + maxChunkSize > bytes.length ? bytes.length : i + maxChunkSize,
+        //   );
+
+        //   await writeCharacteristic.write(
+        //     Uint8List.fromList(chunk),
+        //     withoutResponse: true,
+        //   );
+        // }
 
         return;
       } catch (e) {
@@ -181,7 +218,8 @@ class OtherPrinterManager {
 
   Future<void> _getUSBPrinters() async {
     try {
-      final devices = await FlutterThermalPrinterPlatform.instance.startUsbScan();
+      final devices = await FlutterThermalPrinterPlatform.instance
+          .startUsbScan();
 
       List<Printer> usbPrinters = [];
       for (var map in devices) {
@@ -193,7 +231,8 @@ class OtherPrinterManager {
           address: map['vendorId'].toString(),
           isConnected: map['connected'] ?? false,
         );
-        printer.isConnected = await FlutterThermalPrinterPlatform.instance.isConnected(printer);
+        printer.isConnected = await FlutterThermalPrinterPlatform.instance
+            .isConnected(printer);
         usbPrinters.add(printer);
       }
 
@@ -201,14 +240,16 @@ class OtherPrinterManager {
       _usbSubscription?.cancel();
       _usbSubscription = eventChannel.receiveBroadcastStream().listen((event) {
         final map = Map<String, dynamic>.from(event);
-        _updateOrAddPrinter(Printer(
-          vendorId: map['vendorId'].toString(),
-          productId: map['productId'].toString(),
-          name: map['name'],
-          connectionType: ConnectionType.USB,
-          address: map['vendorId'].toString(),
-          isConnected: map['connected'] ?? false,
-        ));
+        _updateOrAddPrinter(
+          Printer(
+            vendorId: map['vendorId'].toString(),
+            productId: map['productId'].toString(),
+            name: map['name'],
+            connectionType: ConnectionType.USB,
+            address: map['vendorId'].toString(),
+            isConnected: map['connected'] ?? false,
+          ),
+        );
       });
 
       sortDevices();
@@ -275,28 +316,34 @@ class OtherPrinterManager {
 
   Future<List<Printer>> _getBLESystemDevices() async {
     return (await FlutterBluePlus.systemDevices([]))
-        .map((device) => Printer(
-              address: device.remoteId.str,
-              name: device.platformName,
-              connectionType: ConnectionType.BLE,
-              isConnected: device.isConnected,
-            ))
+        .map(
+          (device) => Printer(
+            address: device.remoteId.str,
+            name: device.platformName,
+            connectionType: ConnectionType.BLE,
+            isConnected: device.isConnected,
+          ),
+        )
         .toList();
   }
 
   Future<List<Printer>> _getBLEBondedDevices() async {
     return (await FlutterBluePlus.bondedDevices)
-        .map((device) => Printer(
-              address: device.remoteId.str,
-              name: device.platformName,
-              connectionType: ConnectionType.BLE,
-              isConnected: device.isConnected,
-            ))
+        .map(
+          (device) => Printer(
+            address: device.remoteId.str,
+            name: device.platformName,
+            connectionType: ConnectionType.BLE,
+            isConnected: device.isConnected,
+          ),
+        )
         .toList();
   }
 
   void _updateOrAddPrinter(Printer printer) {
-    final index = _devices.indexWhere((device) => device.address == printer.address);
+    final index = _devices.indexWhere(
+      (device) => device.address == printer.address,
+    );
     if (index == -1) {
       _devices.add(printer);
     } else {
@@ -306,7 +353,9 @@ class OtherPrinterManager {
   }
 
   void sortDevices() {
-    _devices.removeWhere((element) => element.name == null || element.name == '');
+    _devices.removeWhere(
+      (element) => element.name == null || element.name == '',
+    );
     // remove items having same vendorId
     Set<String> seen = {};
     _devices.retainWhere((element) {
@@ -326,10 +375,8 @@ class OtherPrinterManager {
   }
 
   Stream<bool> get isBleTurnedOnStream {
-    return FlutterBluePlus.adapterState.map(
-      (event) {
-        return event == BluetoothAdapterState.on;
-      },
-    );
+    return FlutterBluePlus.adapterState.map((event) {
+      return event == BluetoothAdapterState.on;
+    });
   }
 }
